@@ -22,7 +22,7 @@ use-of-root-account-count:
 # 3.1 – Ensure a log metric filter and alarm exist for unauthorized API calls
 authorization-failure-count:
   metric_name: "AuthorizationFailureCount"
-  filter_pattern: '{($.errorCode = "*UnauthorizedOperation") || ($.errorCode = "AccessDenied*")}'
+  filter_pattern: '{($.errorCode="*UnauthorizedOperation") || ($.errorCode="AccessDenied*")}'
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when an unauthorized API call is made."
   metric_value: "1"
@@ -37,7 +37,7 @@ authorization-failure-count:
 # 3.2 – Ensure a log metric filter and alarm exist for AWS Management Console sign-in without MFA
 console-signin-without-mfa-count:
   metric_name: "ConsoleSignInWithoutMfaCount"
-  filter_pattern: '{ ($.eventName = "ConsoleLogin") && ($.additionalEventData.MFAUsed != "Yes") }'
+  filter_pattern: '{($.eventName="ConsoleLogin") && ($.additionalEventData.MFAUsed !="Yes")}'
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when a user logs into the console without MFA."
   metric_value: "1"
@@ -53,8 +53,12 @@ console-signin-without-mfa-count:
 iam-policy-event-count:
   metric_name: "IAMPolicyEventCount"
   filter_pattern:
-    "{ ($.eventName = DeleteGroupPolicy) || ($.eventName = DeleteRolePolicy)
-    ||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}"
+    "{($.eventName=DeleteGroupPolicy) || ($.eventName=DeleteRolePolicy) || ($.eventName=DeleteUserPolicy) ||
+    ($.eventName=PutGroupPolicy) || ($.eventName=PutRolePolicy) || ($.eventName=PutUserPolicy) ||
+    ($.eventName=CreatePolicy) || ($.eventName=DeletePolicy) || ($.eventName=CreatePolicyVersion) ||
+    ($.eventName=DeletePolicyVersion) || ($.eventName=AttachRolePolicy) || ($.eventName=DetachRolePolicy) ||
+    ($.eventName=AttachUserPolicy) || ($.eventName=DetachUserPolicy) || ($.eventName=AttachGroupPolicy) ||
+    ($.eventName=DetachGroupPolicy)}"
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when an API call is made to change an IAM policy."
   alarm_threshold: "3"
@@ -70,8 +74,8 @@ iam-policy-event-count:
 cloud-trail-event-count:
   metric_name: "CloudTrailEventCount"
   filter_pattern:
-    "{ ($.eventName = CreateTrail) || ($.eventName = UpdateTrail) || ($.eventName = DeleteTrail) || ($.eventName =
-    StartLogging) || ($.eventName = StopLogging) }"
+    "{($.eventName=CreateTrail) || ($.eventName=UpdateTrail) || ($.eventName=DeleteTrail) || ($.eventName=StartLogging)
+    || ($.eventName=StopLogging)}"
   metric_namespace: "CISBenchmark"
   alarm_description:
     "Alarms when an API call is made to create, update or delete a .cloudtrail. trail, or to start or stop logging to a
@@ -88,7 +92,7 @@ cloud-trail-event-count:
 #3.6 – Ensure a log metric filter and alarm exist for AWS Management Console authentication failures
 console-sign-in-failure-count:
   metric_name: "ConsoleSignInFailureCount"
-  filter_pattern: '{ ($.eventName = ConsoleLogin) && ($.errorMessage = "Failed authentication") }'
+  filter_pattern: '{($.eventName=ConsoleLogin) && ($.errorMessage="Failed authentication")}'
   metric_namespace: "CISBenchmark"
   alarm_name: "UnauthenticatedApiCallForConsoleLogin"
   alarm_description: "Alarms when an unauthenticated API call is made to sign into the console."
@@ -104,7 +108,7 @@ console-sign-in-failure-count:
 kms-key-pending-deletion-error-count:
   metric_name: "KMSKeyPendingDeletionErrorCount"
   filter_pattern:
-    "{($.eventSource = kms.amazonaws.com) && (($.eventName=DisableKey)||($.eventName=ScheduleKeyDeletion))}"
+    "{($.eventSource=kms.amazonaws.com) && (($.eventName=DisableKey) || ($.eventName=ScheduleKeyDeletion))}"
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when a customer created KMS key is pending deletion."
   metric_value: "1"
@@ -120,10 +124,10 @@ kms-key-pending-deletion-error-count:
 s3-bucket-policy-event-count:
   metric_name: "S3BucketPolicyEventCount"
   filter_pattern:
-    "{ ($.eventSource = s3.amazonaws.com) && (($.eventName = PutBucketAcl) || ($.eventName = PutBucketPolicy) ||
-    ($.eventName = PutBucketCors) || ($.eventName = PutBucketLifecycle) || ($.eventName = PutBucketReplication) ||
-    ($.eventName = DeleteBucketPolicy) || ($.eventName = DeleteBucketCors) || ($.eventName = DeleteBucketLifecycle) ||
-    ($.eventName = DeleteBucketReplication)) }"
+    "{($.eventSource=s3.amazonaws.com) && (($.eventName=PutBucketAcl) || ($.eventName=PutBucketPolicy) ||
+    ($.eventName=PutBucketCors) || ($.eventName=PutBucketLifecycle) || ($.eventName=PutBucketReplication) ||
+    ($.eventName=DeleteBucketPolicy) || ($.eventName=DeleteBucketCors) || ($.eventName=DeleteBucketLifecycle) ||
+    ($.eventName=DeleteBucketReplication))}"
   metric_namespace: "CISBenchmark"
   alarm_description:
     "Alarms when an API call is made to S3 to put or delete a Bucket Lifecycle Policy, Bucket Policy or Bucket ACL."
@@ -140,8 +144,8 @@ s3-bucket-policy-event-count:
 aws-config-change-count:
   metric_name: "AWSConfigChangeCount"
   filter_pattern:
-    "{($.eventSource = config.amazonaws.com) &&
-    (($.eventName=StopConfigurationRecorder)||($.eventName=DeleteDeliveryChannel)||($.eventName=PutDeliveryChannel)||($.eventName=PutConfigurationRecorder))}"
+    "{($.eventSource=config.amazonaws.com) && (($.eventName=StopConfigurationRecorder) ||
+    ($.eventName=DeleteDeliveryChannel) || ($.eventName=PutDeliveryChannel) || ($.eventName=PutConfigurationRecorder))}"
   metric_namespace: "CISBenchmark"
   alarm_name: "AWSConfigConfigurationModified"
   alarm_description: "Alarms when AWS Config changes."
@@ -157,9 +161,9 @@ aws-config-change-count:
 security-group-event-count:
   metric_name: "SecurityGroupEventCount"
   filter_pattern:
-    "{ ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName =
-    RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) ||
-    ($.eventName = DeleteSecurityGroup) }"
+    "{($.eventName=AuthorizeSecurityGroupIngress) || ($.eventName=AuthorizeSecurityGroupEgress) ||
+    ($.eventName=RevokeSecurityGroupIngress) || ($.eventName=RevokeSecurityGroupEgress) ||
+    ($.eventName=CreateSecurityGroup) || ($.eventName=DeleteSecurityGroup)}"
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when an API call is made to create, update or delete a Security Group."
   metric_value: "1"
@@ -175,9 +179,9 @@ security-group-event-count:
 network-acl-event-count:
   metric_name: "NetworkAclEventCount"
   filter_pattern:
-    "{ ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) ||
-    ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName =
-    ReplaceNetworkAclAssociation) }"
+    "{($.eventName=CreateNetworkAcl) || ($.eventName=CreateNetworkAclEntry) || ($.eventName=DeleteNetworkAcl) ||
+    ($.eventName=DeleteNetworkAclEntry) || ($.eventName=ReplaceNetworkAclEntry) ||
+    ($.eventName=ReplaceNetworkAclAssociation)}"
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when an API call is made to create, update or delete a Network ACL."
   metric_value: "1"
@@ -193,9 +197,9 @@ network-acl-event-count:
 gateway-event-count:
   metric_name: "GatewayEventCount"
   filter_pattern:
-    "{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName =
-    AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) ||
-    ($.eventName = DetachInternetGateway) }"
+    "{($.eventName=CreateCustomerGateway) || ($.eventName=DeleteCustomerGateway) || ($.eventName=AttachInternetGateway)
+    || ($.eventName=CreateInternetGateway) || ($.eventName=DeleteInternetGateway) ||
+    ($.eventName=DetachInternetGateway)}"
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when an API call is made to create, update or delete a Customer or Internet Gateway."
   metric_value: "1"
@@ -211,9 +215,9 @@ gateway-event-count:
 route-table-changes-count:
   metric_name: "RouteTableChangesCount"
   filter_pattern:
-    "{ ($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName =
-    ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName =
-    DisassociateRouteTable) }"
+    "{($.eventName=CreateRoute) || ($.eventName=CreateRouteTable) || ($.eventName=ReplaceRoute) ||
+    ($.eventName=ReplaceRouteTableAssociation) || ($.eventName=DeleteRouteTable) || ($.eventName=DeleteRoute) ||
+    ($.eventName=DisassociateRouteTable)}"
   metric_namespace: "CISBenchmark"
   alarm_description: "Alarms when route table changes are detected."
   metric_value: "1"
@@ -229,11 +233,11 @@ route-table-changes-count:
 vpc-event-count:
   metric_name: "VpcEventCount"
   filter_pattern:
-    "{ ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName =
-    AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName =
-    DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) ||
-    ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName =
-    EnableVpcClassicLink) }"
+    "{($.eventName=CreateVpc) || ($.eventName=DeleteVpc) || ($.eventName=ModifyVpcAttribute) ||
+    ($.eventName=AcceptVpcPeeringConnection) || ($.eventName=CreateVpcPeeringConnection) ||
+    ($.eventName=DeleteVpcPeeringConnection) || ($.eventName=RejectVpcPeeringConnection) ||
+    ($.eventName=AttachClassicLinkVpc) || ($.eventName=DetachClassicLinkVpc) || ($.eventName=DisableVpcClassicLink) ||
+    ($.eventName=EnableVpcClassicLink)}"
   metric_namespace: "CISBenchmark"
   alarm_description:
     "Alarms when an API call is made to create, update or delete a VPC, VPC peering connection or VPC connection to
